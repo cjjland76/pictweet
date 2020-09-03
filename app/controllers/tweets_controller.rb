@@ -3,7 +3,9 @@ class TweetsController < ApplicationController
   before_action :move_to_index, except: [:index, :show, :search]
 
   def index
-    @tweets = Tweet.includes(:user).order("created_at DESC")
+    # @tweets = Tweet.includes(:user).order("created_at DESC")
+    query = "SELECT * FROM tweets"
+    @tweets = Tweet.find_by_sql(query)
   end
 
   def new
@@ -34,7 +36,8 @@ class TweetsController < ApplicationController
   end
 
   def search
-    @tweets = Tweet.search(params[:keyword])
+    @tweets = SearchTweetsService.search_tweets(params[:keyword])
+    # @tweets = Tweet.search(params[:keyword])
   end
 
   private
@@ -45,7 +48,7 @@ class TweetsController < ApplicationController
   def set_tweet
     @tweet = Tweet.find(params[:id])
   end
-
+  
   def move_to_index
     unless user_signed_in?
       redirect_to action: :index
